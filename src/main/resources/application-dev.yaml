@@ -1,0 +1,17 @@
+server:
+  port: 8087
+  servlet:
+    context-path: /dynamic-api
+
+logging:
+  level:
+    org:
+      springframework:
+        web: INFO
+      hibernate: INFO
+
+spring:
+  application:
+    name: DynamicSpecification
+    main:
+      allow-bean-definition-overriding: true
