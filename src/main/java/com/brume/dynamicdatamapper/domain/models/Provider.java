@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 public class Provider {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
 
-    private Long provider_id;
+    private Long id;
 
     @OneToMany(mappedBy = "provider")
     private List<Entry> entries;

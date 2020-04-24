@@ -35,7 +35,7 @@ public class AppServiceProvider {
         }
 
         val provider = new Provider ();
-        provider.setProvider_id  ( providerId );
+        provider.setId( providerId );
         provider.setFields ( String.join ( ",", fields ) );
 
         providerRepository.save ( provider );
@@ -132,7 +132,7 @@ public class AppServiceProvider {
 
                 for (Attribute attribute : searchResults) {
                     Entry entry = attribute.getEntry ();
-                    entriesMap.put ( entry.getEntry_id (), entry );
+                    entriesMap.put ( entry.getId (), entry );
                 }
             }
 

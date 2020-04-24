@@ -24,7 +24,7 @@ public class ProviderController {
     }
 
 
-    @PostMapping(value = "/providerspecification")
+    @PostMapping(value = "providerspecification")
     public ResponseEntity createProviderSpecification(@RequestBody Map<String, Object> request) {
         // TODO: process POST request
 

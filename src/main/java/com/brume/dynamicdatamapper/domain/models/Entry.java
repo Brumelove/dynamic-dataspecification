@@ -12,8 +12,8 @@ import javax.persistence.*;
 @Data @Entity @NoArgsConstructor
 public class Entry {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long entry_id;
+    @GeneratedValue
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "provider_id", nullable = false)
