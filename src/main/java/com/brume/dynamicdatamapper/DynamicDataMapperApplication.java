@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DynamicdatamapperApplication {
+public class DynamicDataMapperApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run ( DynamicdatamapperApplication.class, args );
+        SpringApplication.run ( DynamicDataMapperApplication.class, args );
     }
 
 }

@@ -1,15 +1,17 @@
 package com.brume.dynamicdatamapper.usecases.serviceProviders;
 
-import com.brume.dynamicdatamapper.domian.models.Attribute;
-import com.brume.dynamicdatamapper.domian.models.Entry;
-import com.brume.dynamicdatamapper.domian.models.Provider;
+import com.brume.dynamicdatamapper.domain.models.Attribute;
+import com.brume.dynamicdatamapper.domain.models.Entry;
+import com.brume.dynamicdatamapper.domain.models.Provider;
 import com.brume.dynamicdatamapper.usecases.repositories.IAttributeRepository;
+import com.brume.dynamicdatamapper.usecases.repositories.IEntryRepository;
 import com.brume.dynamicdatamapper.usecases.repositories.IProviderRepository;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+
 @Service
 public class AppServiceProvider {
 
@@ -17,12 +19,14 @@ public class AppServiceProvider {
 
     private final IProviderRepository providerRepository;
 
+    private final IEntryRepository entryRepository;
+
 
     @Autowired
-    public AppServiceProvider(IAttributeRepository attributeRepository, IProviderRepository providerRepository) {
+    public AppServiceProvider(IAttributeRepository attributeRepository, IProviderRepository providerRepository, IEntryRepository entryRepository) {
         this.attributeRepository = attributeRepository;
         this.providerRepository = providerRepository;
-
+        this.entryRepository = entryRepository;
     }
 
     public ExecutionMethodResponse createDataSpecification(Long providerId, List<String> fields) {
@@ -31,7 +35,7 @@ public class AppServiceProvider {
         }
 
         val provider = new Provider ();
-        provider.setId ( providerId );
+        provider.setProvider_id  ( providerId );
         provider.setFields ( String.join ( ",", fields ) );
 
         providerRepository.save ( provider );
@@ -128,7 +132,7 @@ public class AppServiceProvider {
 
                 for (Attribute attribute : searchResults) {
                     Entry entry = attribute.getEntry ();
-                    entriesMap.put ( entry.getId (), entry );
+                    entriesMap.put ( entry.getEntry_id (), entry );
                 }
             }
 

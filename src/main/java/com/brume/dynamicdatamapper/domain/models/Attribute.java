@@ -1,18 +1,19 @@
-package com.brume.dynamicdatamapper.domian.models;
+package com.brume.dynamicdatamapper.domain.models;
 
 import java.util.Map;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
-@Data
+@Data @Entity @NoArgsConstructor
 public class Attribute {
 
-    @GeneratedValue
+    @Id
+
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
