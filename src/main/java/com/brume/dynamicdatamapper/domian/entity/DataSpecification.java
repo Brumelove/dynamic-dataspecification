@@ -19,6 +19,6 @@ public class DataSpecification {
     public Long id;
 
     private Integer providerId;
-    @ManyToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Fields> fields ;
 }

@@ -13,5 +13,20 @@ logging:
 spring:
   application:
     name: DynamicSpecification
-    main:
-      allow-bean-definition-overriding: true
+    datasource:
+      url: jdbc:postgresql://localhost:5432/accelerex?useUnicode=true&characterEncoding=UTF8&useSSL=false
+      username: accelerex
+      password: accelerex
+      #driverClassName: org.
+
+
+      jpa:
+        hibernate.ddl-auto: update
+        properties:
+          hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+          hibernate.format_sql: false
+          hibernate.jdbc.lob.non_contextual_creation: true
+        hibernate.naming:
+          implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+

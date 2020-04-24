@@ -1,5 +1,6 @@
-package com.brume.dynamicdatamapper.domian.entity;
+package com.brume.dynamicdatamapper.usecases.payload;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,20 +9,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.sql.Timestamp;
-import java.util.Date;
 
 
 /**
  * @author Brume
  **/
-@Data
-@NoArgsConstructor
-@Entity
-public class Fields {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
+@Data @Builder
+public class DataField {
     private String name;
     private String age;
-    private Date timestamp;
+    private Timestamp timestamp;
 }
