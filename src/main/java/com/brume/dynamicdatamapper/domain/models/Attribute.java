@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.persistence.*;
 
+import com.google.common.primitives.Longs;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
@@ -51,5 +52,24 @@ public class Attribute {
 
         return attribute;
 
+    }
+    @Override
+    public boolean equals(Object o){
+        if(o == this){
+            return true;
+        }
+        if (!(o instanceof Attribute)){
+            return false;
+        }
+
+        Attribute other = (Attribute)o;
+        boolean attributeEquals = (this.getId() == null && other.getId() == null || (this.getId() != null && this.getId() == other.getId()));
+
+        return this.getId ().equals ( other.getId () );
+    }
+
+    @Override
+    public int hashCode(){
+        return Longs.hashCode ( this.getId () );
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -32,67 +33,67 @@ public class AppServiceProvider {
     }
 
     public ExecutionMethodResponse createDataSpecification(Long providerId, List<String> fields) {
-        if (fields.size() == 0) {
-            return new ExecutionMethodResponse(false, "fields definition can't be empty");
+        if (fields.size () == 0) {
+            return new ExecutionMethodResponse ( false, "fields definition can't be empty" );
         }
 
-        val provider = new Provider();
-        provider.setId(providerId);
-        provider.setFields(String.join(",", fields));
+        val provider = new Provider ();
+        provider.setId ( providerId );
+        provider.setFields ( String.join ( ",", fields ) );
 
-        providerRepository.save(provider);
+        providerRepository.save ( provider );
 
-        return new ExecutionMethodResponse(true, "successfully created provider");
+        return new ExecutionMethodResponse ( true, "successfully created provider" );
 
     }
 
     public ExecutionMethodResponse loadData(Long providerId, List<Map<String, Object>> data) {
         // so we'd first check if the provider exists.
-        Optional<Provider> provider = providerRepository.findById(providerId);
-        if (provider.isPresent()) {
+        Optional<Provider> provider = providerRepository.findById ( providerId );
+        if (provider.isPresent ()) {
             // next we validate the field specification.
-            Provider gottenProvider = provider.get();
+            Provider gottenProvider = provider.get ();
 
-            Set<String> fields = new HashSet<>(Arrays.asList(gottenProvider.getFields().split(",")));
-            List<Entry> entriesToSave = new ArrayList<>();
-            for (int i = 0; i < data.size(); i++) {
-                Entry entry = new Entry();
-                entry.setProvider(gottenProvider);
+            Set<String> fields = new HashSet<> ( Arrays.asList ( gottenProvider.getFields ().split ( "," ) ) );
+            List<Entry> entriesToSave = new ArrayList<> ();
+            for (int i = 0; i < data.size (); i++) {
+                Entry entry = new Entry ();
+                entry.setProvider ( gottenProvider );
 
-                entryRepository.save(entry);
+                entryRepository.save ( entry );
 
-                Map<String, Object> singleEntry = data.get(i);
-                log.info("Map data", singleEntry.values());
+                Map<String, Object> singleEntry = data.get ( i );
+                log.info ( "Map data", singleEntry.values () );
 
-                Set<String> listOfKeys = new HashSet<>(singleEntry.keySet());
-                listOfKeys.removeAll(fields);
+                Set<String> listOfKeys = new HashSet<> ( singleEntry.keySet () );
+                listOfKeys.removeAll ( fields );
 
-                if (listOfKeys.size() > 0) {
-                    return new ExecutionMethodResponse(false, "Fields " + String.join(", ", listOfKeys)
-                                                              + " weren't specified when creating the provider");
+                if (listOfKeys.size () > 0) {
+                    return new ExecutionMethodResponse ( false, "Fields " + String.join ( ", ", listOfKeys )
+                                                                + " weren't specified when creating the provider" );
                 }
 
-                List<Attribute> attributesList = new ArrayList<>();
+                List<Attribute> attributesList = new ArrayList<> ();
 
-                for (Map.Entry<String, Object> attributeMap : singleEntry.entrySet()) {
-                    Attribute createdAttribute = Attribute.fromMapEntry(entry, attributeMap);
-                    attributesList.add(createdAttribute);
-                    attributeRepository.save(createdAttribute);
+                for (Map.Entry<String, Object> attributeMap : singleEntry.entrySet ()) {
+                    Attribute createdAttribute = Attribute.fromMapEntry ( entry, attributeMap );
+                    attributesList.add ( createdAttribute );
+                    attributeRepository.save ( createdAttribute );
                 }
 
-                entry.setAttributes(attributesList);
+                entry.setAttributes ( attributesList );
 
-                entriesToSave.add(entry);
+                entriesToSave.add ( entry );
             }
 
             //gottenProvider.setEntries(entriesToSave);
 
             //providerRepository.save(gottenProvider);
 
-            return new ExecutionMethodResponse(true, "");
+            return new ExecutionMethodResponse ( true, "" );
 
         }
-        return new ExecutionMethodResponse(false, "Could not find provider");
+        return new ExecutionMethodResponse ( false, "Could not find provider" );
     }
 
     public List<Map<String, Object>> getDataForProvider(Long providerId, Map<String, String> filters) {
@@ -116,29 +117,54 @@ public class AppServiceProvider {
                     continue;
                 }
 
-                List<Attribute> searchResults = new ArrayList<>();
+                List<Attribute> eqcSearchResults = null;
+                List<Attribute> eqSearchResults = null;
+                List<Attribute> gtSearchResults = null;
+                List<Attribute> ltSearchResults = null;
+
                 if (filterSplit.get(0).equals("eqc")) {
                     // this means we're comparing strings
-                    searchResults = attributeRepository.findByProviderAndKeyAndValueContainingIgnoreCase(gottenProvider,
-                            attributeKey, filterSplit.get(1));
+                    eqcSearchResults = attributeRepository.findByProviderAndKeyAndValueContainingIgnoreCase(
+                            gottenProvider, attributeKey, filterSplit.get(1));
                 }
 
                 switch (filterSplit.get(0)) {
                     case "eq":
-                        searchResults = attributeRepository.findByProviderAndKeyAndNumericValueEquals(gottenProvider,
+                        eqSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueEquals(gottenProvider,
                                 attributeKey, Integer.parseInt(filterSplit.get(1)));
                         break;
                     case "gt":
-                        searchResults = attributeRepository.findByProviderAndKeyAndNumericValueGreaterThan(
+                        gtSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueGreaterThan(
                                 gottenProvider, attributeKey, Integer.parseInt(filterSplit.get(1)));
                         break;
                     case "lt":
-                        searchResults = attributeRepository.findByProviderAndKeyAndNumericValueLessThan(gottenProvider,
-                                attributeKey, Integer.parseInt(filterSplit.get(1)));
+                        ltSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueLessThan(
+                                gottenProvider, attributeKey, Integer.parseInt(filterSplit.get(1)));
                         break;
                 }
 
-                for (Attribute attribute : searchResults) {
+                Set<Attribute> intersectedSet = new HashSet<>();
+
+                if (eqcSearchResults != null) {
+                    intersectedSet = new HashSet<>(eqcSearchResults);
+                }
+                if (eqSearchResults != null) {
+                    intersectedSet =intersectedSet.stream().distinct().filter(eqSearchResults::contains)
+                            .collect(Collectors.toSet());
+                }
+
+                if (gtSearchResults != null){
+                    intersectedSet = intersectedSet.stream().distinct().filter(gtSearchResults::contains)
+                        .collect(Collectors.toSet());
+                }
+
+                if (ltSearchResults != null){
+                    intersectedSet =intersectedSet.stream().distinct().filter(ltSearchResults::contains)
+                        .collect(Collectors.toSet());
+                }
+
+                List<Attribute> finalList = new ArrayList<>(intersectedSet);
+                for (Attribute attribute : finalList) {
                     Entry entry = attribute.getEntry();
                     entriesMap.put(entry.getId(), entry);
                 }
@@ -152,5 +178,4 @@ public class AppServiceProvider {
 
         return results;
     }
-
 }
