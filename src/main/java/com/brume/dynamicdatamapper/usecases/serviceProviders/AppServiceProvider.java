@@ -6,6 +6,7 @@ import com.brume.dynamicdatamapper.domain.models.Provider;
 import com.brume.dynamicdatamapper.usecases.repositories.IAttributeRepository;
 import com.brume.dynamicdatamapper.usecases.repositories.IEntryRepository;
 import com.brume.dynamicdatamapper.usecases.repositories.IProviderRepository;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j
 public class AppServiceProvider {
 
     private final IAttributeRepository attributeRepository;
@@ -49,15 +51,18 @@ public class AppServiceProvider {
         Optional<Provider> provider = providerRepository.findById ( providerId );
         if (provider.isPresent ()) {
             // next we validate the field specification.
+            Provider gottenProvider = provider.get();
 
-            Set<String> fields = new HashSet<> ( Arrays.asList ( provider.get ().getFields ().split ( "," ) ) );
+            Set<String> fields = new HashSet<> ( Arrays.asList ( gottenProvider.getFields ().split ( "," ) ) );
             List<Entry> entriesToSave = new ArrayList<> ();
             for (int i = 0; i < data.size (); i++) {
                 Entry entry = new Entry ();
-                entry.setProvider ( provider.get () );
+                entry.setProvider ( gottenProvider );
 
                 Map<String, Object> singleEntry = data.get ( i );
-                Set<String> listOfKeys = singleEntry.keySet ();
+                log.info ( "Map data", singleEntry.values () );
+
+                Set<String> listOfKeys = new HashSet<> (singleEntry.keySet ());
                 listOfKeys.removeAll ( fields );
 
                 if (listOfKeys.size () > 0) {
@@ -76,7 +81,7 @@ public class AppServiceProvider {
                 entriesToSave.add ( entry );
             }
 
-            Provider gottenProvider = provider.get ();
+
             gottenProvider.setEntries ( entriesToSave );
 
             providerRepository.save ( gottenProvider );

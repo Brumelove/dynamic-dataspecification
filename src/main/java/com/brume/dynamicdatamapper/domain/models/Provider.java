@@ -12,11 +12,9 @@ import lombok.NoArgsConstructor;
 public class Provider {
 
     @Id
-    @GeneratedValue
-
     private Long id;
 
-    @OneToMany(mappedBy = "provider")
+    @OneToMany(mappedBy = "provider", cascade = CascadeType.PERSIST)
     private List<Entry> entries;
 
     private String fields;

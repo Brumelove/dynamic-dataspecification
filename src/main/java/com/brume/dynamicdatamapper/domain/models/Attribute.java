@@ -12,12 +12,12 @@ import org.springframework.lang.Nullable;
 public class Attribute {
 
     @Id
-
     @GeneratedValue
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "provider_id", nullable = false)
+    @Nullable
+    @JoinColumn(name = "provider_id")
     private Provider provider;
 
     private String key;

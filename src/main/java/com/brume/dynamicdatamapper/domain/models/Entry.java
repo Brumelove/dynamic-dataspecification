@@ -1,7 +1,9 @@
 package com.brume.dynamicdatamapper.domain.models;
 
 import lombok.Data;
+import lombok.Generated;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +18,11 @@ public class Entry {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "provider_id", nullable = false)
-
+    @Nullable
+    @JoinColumn(name = "provider_id")
     private Provider provider;
 
-    @OneToMany(mappedBy = "entry")
+    @OneToMany(mappedBy = "entry", cascade = CascadeType.PERSIST)
     private List<Attribute> attributes;
 
     public static Map<String, Object> toMap(Entry entry) {
