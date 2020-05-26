@@ -7,6 +7,7 @@ import javax.persistence.*;
 import com.google.common.primitives.Longs;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.val;
 import org.springframework.lang.Nullable;
 
 @Data @Entity @NoArgsConstructor
@@ -36,7 +37,7 @@ public class Attribute {
     private Entry entry;
 
     public static Attribute fromMapEntry(Entry entry, Map.Entry<String, Object> attributeMap) {
-        Attribute attribute = new Attribute();
+        val attribute = new Attribute();
         attribute.setKey(attributeMap.getKey());
 
         attribute.setProvider(entry.getProvider());

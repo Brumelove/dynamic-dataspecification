@@ -97,23 +97,23 @@ public class AppServiceProvider {
     }
 
     public List<Map<String, Object>> getDataForProvider(Long providerId, Map<String, String> filters) {
-        Optional<Provider> provider = providerRepository.findById(providerId);
-        if (!provider.isPresent()) {
+        Optional<Provider> provider = providerRepository.findById ( providerId );
+        if (!provider.isPresent ()) {
             return null;
         }
 
-        Provider gottenProvider = provider.get();
+        Provider gottenProvider = provider.get ();
 
-        List<Map<String, Object>> results = new ArrayList<>();
-        Map<Long, Entry> entriesMap = new HashMap<>();
+        List<Map<String, Object>> results = new ArrayList<> ();
+        Map<Long, Entry> entriesMap = new HashMap<> ();
 
-        if (filters.size() > 0) {
-            for (Map.Entry<String, String> filterEntry : filters.entrySet()) {
-                String attributeKey = filterEntry.getKey();
-                String filterValue = filterEntry.getValue();
+        if (filters.size () > 0) {
+            for (Map.Entry<String, String> filterEntry : filters.entrySet ()) {
+                String attributeKey = filterEntry.getKey ();
+                String filterValue = filterEntry.getValue ();
 
-                List<String> filterSplit = Arrays.asList(filterValue.split(":"));
-                if (filterSplit.size() != 2) {
+                List<String> filterSplit = Arrays.asList ( filterValue.split ( ":" ) );
+                if (filterSplit.size () != 2) {
                     continue;
                 }
 
@@ -122,58 +122,58 @@ public class AppServiceProvider {
                 List<Attribute> gtSearchResults = null;
                 List<Attribute> ltSearchResults = null;
 
-                if (filterSplit.get(0).equals("eqc")) {
+                if (filterSplit.get ( 0 ).equals ( "eqc" )) {
                     // this means we're comparing strings
-                    eqcSearchResults = attributeRepository.findByProviderAndKeyAndValueContainingIgnoreCase(
-                            gottenProvider, attributeKey, filterSplit.get(1));
+                    eqcSearchResults = attributeRepository.findByProviderAndKeyAndValueContainingIgnoreCase (
+                            gottenProvider, attributeKey, filterSplit.get ( 1 ) );
                 }
 
-                switch (filterSplit.get(0)) {
+                switch (filterSplit.get ( 0 )) {
                     case "eq":
-                        eqSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueEquals(gottenProvider,
-                                attributeKey, Integer.parseInt(filterSplit.get(1)));
+                        eqSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueEquals ( gottenProvider,
+                                attributeKey, Integer.parseInt ( filterSplit.get ( 1 ) ) );
                         break;
                     case "gt":
-                        gtSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueGreaterThan(
-                                gottenProvider, attributeKey, Integer.parseInt(filterSplit.get(1)));
+                        gtSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueGreaterThan (
+                                gottenProvider, attributeKey, Integer.parseInt ( filterSplit.get ( 1 ) ) );
                         break;
                     case "lt":
-                        ltSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueLessThan(
-                                gottenProvider, attributeKey, Integer.parseInt(filterSplit.get(1)));
+                        ltSearchResults = attributeRepository.findByProviderAndKeyAndNumericValueLessThan (
+                                gottenProvider, attributeKey, Integer.parseInt ( filterSplit.get ( 1 ) ) );
                         break;
                 }
 
-                Set<Attribute> intersectedSet = new HashSet<>();
+                Set<Attribute> intersectedSet = new HashSet<> ();
 
                 if (eqcSearchResults != null) {
-                    intersectedSet = new HashSet<>(eqcSearchResults);
+                    intersectedSet = new HashSet<> ( eqcSearchResults );
                 }
                 if (eqSearchResults != null) {
-                    intersectedSet =intersectedSet.stream().distinct().filter(eqSearchResults::contains)
-                            .collect(Collectors.toSet());
+                    intersectedSet = intersectedSet.stream ().distinct ().filter ( eqSearchResults::contains )
+                            .collect ( Collectors.toSet () );
                 }
 
-                if (gtSearchResults != null){
-                    intersectedSet = intersectedSet.stream().distinct().filter(gtSearchResults::contains)
-                        .collect(Collectors.toSet());
+                if (gtSearchResults != null) {
+                    intersectedSet = intersectedSet.stream ().distinct ().filter ( gtSearchResults::contains )
+                            .collect ( Collectors.toSet () );
                 }
 
-                if (ltSearchResults != null){
-                    intersectedSet =intersectedSet.stream().distinct().filter(ltSearchResults::contains)
-                        .collect(Collectors.toSet());
+                if (ltSearchResults != null) {
+                    intersectedSet = intersectedSet.stream ().distinct ().filter ( ltSearchResults::contains )
+                            .collect ( Collectors.toSet () );
                 }
 
-                List<Attribute> finalList = new ArrayList<>(intersectedSet);
+                List<Attribute> finalList = new ArrayList<> ( intersectedSet );
                 for (Attribute attribute : finalList) {
-                    Entry entry = attribute.getEntry();
-                    entriesMap.put(entry.getId(), entry);
+                    Entry entry = attribute.getEntry ();
+                    entriesMap.put ( entry.getId (), entry );
                 }
             }
 
         }
 
-        for (Map.Entry<Long, Entry> entryMapSet : entriesMap.entrySet()) {
-            results.add(Entry.toMap(entryMapSet.getValue()));
+        for (Map.Entry<Long, Entry> entryMapSet : entriesMap.entrySet ()) {
+            results.add ( Entry.toMap ( entryMapSet.getValue () ) );
         }
 
         return results;
