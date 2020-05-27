@@ -98,7 +98,7 @@ public class AppServiceProvider {
 
     public List<Map<String, Object>> getDataForProvider(Long providerId, Map<String, String> filters) {
         Optional<Provider> provider = providerRepository.findById ( providerId );
-        if (!provider.isPresent ()) {
+        if (provider.isEmpty ()) {
             return null;
         }
 
